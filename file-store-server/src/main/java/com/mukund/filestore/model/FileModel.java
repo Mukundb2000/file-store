@@ -9,7 +9,7 @@ import lombok.Data;
 
 @Entity(name = "files")
 @Data
-public class File {
+public class FileModel {
 
 	@Id
 	private String name;
@@ -20,7 +20,6 @@ public class File {
 
 	private long uploadedSize;
 
-	private Date uploadedAt;
+	private Date createdAt;
 
-	private Date lastModifiedAt;
 }
