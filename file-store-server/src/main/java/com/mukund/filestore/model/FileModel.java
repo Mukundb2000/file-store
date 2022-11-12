@@ -22,4 +22,5 @@ public class FileModel {
 
 	private Date createdAt;
 
+	private FileStatus status;
 }

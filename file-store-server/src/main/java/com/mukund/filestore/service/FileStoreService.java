@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.mukund.filestore.model.FileModel;
+import com.mukund.filestore.model.FileStatus;
 import com.mukund.filestore.repository.FileRepository;
 
 @Service
@@ -22,7 +23,6 @@ public class FileStoreService {
 	@Autowired
 	private FileRepository fileRepository;
 
-//	@Value("${files.base_path}")
 	private String BASE_PATH = "D:/file-store/files";
 
 	private Path root = Paths.get(BASE_PATH);
@@ -48,7 +48,19 @@ public class FileStoreService {
 
 				byte[] bytes = data.readAllBytes();
 
+				long updatedSize = uploadedSize + bytes.length;
+
+				if (updatedSize > fileSize) {
+
+					return null; // last chunk size exceeds fileSize
+				}
+
 				if (startByte == 0) {
+
+					if (fileModel.getUploadedSize() > 0) {
+
+						return null; // Invalid chunk start
+					}
 
 					Files.write(root.resolve(fileName), bytes, StandardOpenOption.CREATE);
 
@@ -60,15 +72,20 @@ public class FileStoreService {
 					}
 
 					Files.write(root.resolve(fileName), bytes, StandardOpenOption.APPEND);
+
 				}
 
-				fileModel.setUploadedSize(uploadedSize + bytes.length);
+				if (updatedSize == fileSize) {
+
+					fileModel.setStatus(FileStatus.COMPLETE);
+				}
+
+				fileModel.setUploadedSize(updatedSize);
 
 				fileRepository.save(fileModel);
 
 			} catch (IOException e) {
 
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -82,6 +99,7 @@ public class FileStoreService {
 			fileModel.setName(fileName);
 			fileModel.setPath(root.resolve(fileName).toString());
 			fileModel.setTotalFileSize(fileSize);
+			fileModel.setStatus(FileStatus.INCOMPLETE);
 
 			try {
 
@@ -103,7 +121,6 @@ public class FileStoreService {
 
 			} catch (IOException e) {
 
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -111,5 +128,59 @@ public class FileStoreService {
 
 			return fileModel;
 		}
+	}
+
+	public FileModel updateFile(InputStream data, long fileSize, String fileName) {
+
+		Optional<FileModel> fileOptional = fileRepository.findById(fileName);
+
+		FileModel fileModel;
+
+		if (fileOptional.isPresent()) {
+
+			fileModel = fileOptional.get();
+
+		} else {
+
+			fileModel = new FileModel();
+		}
+
+		fileModel.setCreatedAt(new java.sql.Date((new Date()).getTime()));
+		fileModel.setName(fileName);
+		fileModel.setPath(root.resolve(fileName).toString());
+		fileModel.setTotalFileSize(fileSize);
+		fileModel.setStatus(FileStatus.INCOMPLETE);
+
+		try {
+
+			byte[] bytes = data.readAllBytes();
+
+			long uploadedSize = bytes.length;
+
+			if (uploadedSize > fileSize) {
+
+				return null; // last chunk size exceeds fileSize
+			}
+
+			Path newFile = root.resolve(fileName);
+
+			Files.createDirectories(newFile.getParent());
+			Files.write(newFile, bytes);
+
+			fileModel.setUploadedSize(uploadedSize);
+
+			if (uploadedSize == fileSize) {
+
+				fileModel.setStatus(FileStatus.COMPLETE);
+			}
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+
+		fileRepository.save(fileModel);
+
+		return fileModel;
 	}
 }
