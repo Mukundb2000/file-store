@@ -7,7 +7,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,11 @@ public class FileStoreService {
 			FileModel fileModel = fileOptional.get();
 
 			long uploadedSize = fileModel.getUploadedSize();
+
+			if (fileSize != fileModel.getTotalFileSize()) {
+
+				return null; // Invalid fileSize
+			}
 
 			try {
 
@@ -182,5 +189,38 @@ public class FileStoreService {
 		fileRepository.save(fileModel);
 
 		return fileModel;
+	}
+
+	public Map<String, String> deleteFile(String fileName) {
+
+		Optional<FileModel> fileOptional = fileRepository.findById(fileName);
+
+		FileModel fileModel;
+
+		if (fileOptional.isPresent()) {
+
+			fileModel = fileOptional.get();
+
+			try {
+
+				Files.delete(root.resolve(fileName));
+
+			} catch (IOException e) {
+
+				e.printStackTrace();
+			}
+
+			fileRepository.deleteById(fileName);
+
+			Map<String, String> response = new HashMap<>();
+
+			response.put("message", "deleted file '" + fileName + "' successfully");
+
+			return response;
+
+		} else {
+
+			return null; // Invalid fileName
+		}
 	}
 }
