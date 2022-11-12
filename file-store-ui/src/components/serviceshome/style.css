@@ -1,0 +1,12 @@
+.servicesmain{
+    background-color: #282c34;
+    min-height: 100vh;
+    font-size: calc(09px + 1vmin);
+    color: white;
+  margin: 10px 0px;
+}
+
+.buttons{
+    justify-content: center;
+    flex-direction: column;
+}
