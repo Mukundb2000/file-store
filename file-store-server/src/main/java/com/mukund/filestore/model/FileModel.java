@@ -1,16 +1,18 @@
 package com.mukund.filestore.model;
 
 import java.sql.Date;
-import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity(name = "files")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class FileModel {
 
 	@Id
@@ -28,6 +30,4 @@ public class FileModel {
 
 	private String hash;
 
-	@OneToMany(mappedBy = "file")
-	private Set<WordCount> wordCounts;
 }

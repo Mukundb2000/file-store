@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Scanner;
+import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,12 +21,16 @@ import org.springframework.util.StringUtils;
 import com.mukund.filestore.model.FileModel;
 import com.mukund.filestore.model.FileStatus;
 import com.mukund.filestore.repository.FileRepository;
+import com.mukund.filestore.repository.WordRepository;
 
 @Service
 public class FileStoreService {
 
 	@Autowired
 	private FileRepository fileRepository;
+
+	@Autowired
+	private WordRepository wordRepository;
 
 	private String BASE_PATH = "D:/file-store/files";
 
@@ -47,6 +53,80 @@ public class FileStoreService {
 	}
 
 	private void onCompleteFileUpload(FileModel fileModel) {
+
+		try {
+
+			String text = Files.readString(root.resolve(fileModel.getName()));
+
+			TreeMap<String, Integer> freq = new TreeMap<>();
+
+			Scanner sc = new Scanner(text);
+
+			while (sc.hasNext()) {
+
+				String word = sc.next();
+
+				if (freq.containsKey(word)) {
+
+					freq.computeIfPresent(word, (w, c) -> Integer.valueOf(c.intValue() + 1));
+
+				} else {
+
+					freq.computeIfAbsent(word, (w) -> Integer.valueOf(1));
+				}
+			}
+
+			fileRepository.save(fileModel);
+
+			freq.forEach((k, v) -> {
+
+				wordRepository.incrementWord(k, v);
+			});
+
+			sc.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private void onFileDelete(FileModel fileModel) {
+
+		try {
+
+			String text = Files.readString(root.resolve(fileModel.getName()));
+
+			TreeMap<String, Integer> freq = new TreeMap<>();
+
+			Scanner sc = new Scanner(text);
+
+			while (sc.hasNext()) {
+
+				String word = sc.next();
+
+				if (freq.containsKey(word)) {
+
+					freq.computeIfPresent(word, (w, c) -> Integer.valueOf(c.intValue() + 1));
+
+				} else {
+
+					freq.computeIfAbsent(word, (w) -> Integer.valueOf(1));
+				}
+			}
+
+			fileRepository.save(fileModel);
+
+			freq.forEach((k, v) -> {
+
+				wordRepository.decrementWord(k, v);
+			});
+
+			sc.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 	}
 
@@ -242,6 +322,8 @@ public class FileStoreService {
 		if (fileOptional.isPresent()) {
 
 			fileModel = fileOptional.get();
+
+			onFileDelete(fileModel);
 
 			try {
 
