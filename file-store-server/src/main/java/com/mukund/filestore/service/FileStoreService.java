@@ -14,6 +14,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.mukund.filestore.model.FileModel;
 import com.mukund.filestore.model.FileStatus;
@@ -29,20 +30,49 @@ public class FileStoreService {
 
 	private Path root = Paths.get(BASE_PATH);
 
-	public List<FileModel> getFiles() {
+	public List<FileModel> getFiles(String hash, String fileName) {
 
-		List<FileModel> files = fileRepository.findAll();
+		List<FileModel> files;
+
+		if (StringUtils.hasText(hash) && StringUtils.hasText(fileName))
+			files = fileRepository.findByNameAndHash(fileName, hash);
+		else if (StringUtils.hasText(fileName))
+			files = fileRepository.findByName(fileName);
+		else if (StringUtils.hasText(hash))
+			files = fileRepository.findByHash(hash);
+		else
+			files = fileRepository.findAll();
 
 		return files;
 	}
 
-	public FileModel storeChunk(InputStream data, long fileSize, String fileName, long startByte) {
+	private void onCompleteFileUpload(FileModel fileModel) {
+
+	}
+
+	public FileModel storeChunk(InputStream data, long fileSize, String fileName, long startByte, String hash) {
 
 		Optional<FileModel> fileOptional = fileRepository.findById(fileName);
+
+		List<FileModel> sameContentFileOptional = fileRepository.findByHash(hash);
+
+		if (sameContentFileOptional.size() > 0) {
+
+			FileModel fileModel = sameContentFileOptional.get(0);
+
+			if (!fileOptional.isPresent()) {
+				return null; // Already another file is present with same content
+			}
+		}
 
 		if (fileOptional.isPresent()) {
 
 			FileModel fileModel = fileOptional.get();
+
+			if (!fileModel.getHash().equals(hash)) {
+
+				return null; // Invalid hash
+			}
 
 			long uploadedSize = fileModel.getUploadedSize();
 
@@ -82,12 +112,13 @@ public class FileStoreService {
 
 				}
 
+				fileModel.setUploadedSize(updatedSize);
+
 				if (updatedSize == fileSize) {
 
 					fileModel.setStatus(FileStatus.COMPLETE);
+					onCompleteFileUpload(fileModel);
 				}
-
-				fileModel.setUploadedSize(updatedSize);
 
 				fileRepository.save(fileModel);
 
@@ -107,6 +138,7 @@ public class FileStoreService {
 			fileModel.setPath(root.resolve(fileName).toString());
 			fileModel.setTotalFileSize(fileSize);
 			fileModel.setStatus(FileStatus.INCOMPLETE);
+			fileModel.setHash(hash);
 
 			try {
 
@@ -124,7 +156,15 @@ public class FileStoreService {
 					return null; // Invalid start byte
 				}
 
-				fileModel.setUploadedSize(bytes.length);
+				long updatedSize = bytes.length;
+
+				if (updatedSize == fileSize) {
+
+					fileModel.setStatus(FileStatus.COMPLETE);
+					onCompleteFileUpload(fileModel);
+				}
+
+				fileModel.setUploadedSize(updatedSize);
 
 			} catch (IOException e) {
 
@@ -137,7 +177,7 @@ public class FileStoreService {
 		}
 	}
 
-	public FileModel updateFile(InputStream data, long fileSize, String fileName) {
+	public FileModel updateFile(InputStream data, long fileSize, String fileName, String hash) {
 
 		Optional<FileModel> fileOptional = fileRepository.findById(fileName);
 
@@ -157,6 +197,7 @@ public class FileStoreService {
 		fileModel.setPath(root.resolve(fileName).toString());
 		fileModel.setTotalFileSize(fileSize);
 		fileModel.setStatus(FileStatus.INCOMPLETE);
+		fileModel.setHash(hash);
 
 		try {
 
@@ -179,6 +220,7 @@ public class FileStoreService {
 			if (uploadedSize == fileSize) {
 
 				fileModel.setStatus(FileStatus.COMPLETE);
+				onCompleteFileUpload(fileModel);
 			}
 
 		} catch (IOException e) {

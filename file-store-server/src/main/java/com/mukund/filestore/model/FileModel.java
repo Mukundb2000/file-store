@@ -1,9 +1,11 @@
 package com.mukund.filestore.model;
 
 import java.sql.Date;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import lombok.Data;
 
@@ -23,4 +25,9 @@ public class FileModel {
 	private Date createdAt;
 
 	private FileStatus status;
+
+	private String hash;
+
+	@OneToMany(mappedBy = "file")
+	private Set<WordCount> wordCounts;
 }
