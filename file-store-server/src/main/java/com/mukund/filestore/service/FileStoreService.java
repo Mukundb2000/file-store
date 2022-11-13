@@ -156,7 +156,15 @@ public class FileStoreService {
 					return null; // Invalid start byte
 				}
 
-				fileModel.setUploadedSize(bytes.length);
+				long updatedSize = bytes.length;
+
+				if (updatedSize == fileSize) {
+
+					fileModel.setStatus(FileStatus.COMPLETE);
+					onCompleteFileUpload(fileModel);
+				}
+
+				fileModel.setUploadedSize(updatedSize);
 
 			} catch (IOException e) {
 
