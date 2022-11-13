@@ -1,7 +1,7 @@
 import "../../App.css";
 import styled from "styled-components";
 import "./style.css";
-import {Routes, Route, useNavigate, BrowserRouter} from 'react-router-dom';
+import { Routes, Route, useNavigate, BrowserRouter } from "react-router-dom";
 function DeleteFile() {
   const Button = styled.button`
     background-color: #ffbb1c;
@@ -14,7 +14,14 @@ function DeleteFile() {
   `;
   return (
     <div className="main">
-      <h2>UNDER DEVELOPMENT</h2>
+      <p>Enter the filename which you want to delete:</p>
+      <form>
+        <label className="filenametext">
+          Filename:
+          <input type="text" name="Filename" />
+        </label>
+        <input type="submit" value="Submit" />
+      </form>
     </div>
   );
 }
