@@ -1,0 +1,17 @@
+.main{
+    background-color: #fff7c4;
+    min-height: 100vh;
+}
+.uploadbutton{
+    height: 40px;
+    width: 40px;
+}
+
+.uploadbuttonimage{
+    height: 80px;
+    width: 80px;
+}
+
+.imagediv{
+    justify-content: center;
+}
