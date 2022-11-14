@@ -35,7 +35,7 @@ For deploying this application in a Docker environment, please follow the below 
     ``` 
     OR
     ```
-    docker run -it file-store-server -p 8081:8081`
+    docker run -it file-store-server -p 8081:8081
     ```
     
   * Post these steps, the server will be up and running in a container image and is serving requests at localhost:8081
@@ -114,11 +114,11 @@ node store.js freq-words
 #### Print the 10 most frequent words from all files on the server
 
 ```
-node store.js freq-words --limit 10 --order asc
+node store.js freq-words --limit 10 --order dsc
 ```
 
 #### Print the 10 least frequent words from all files on the server
 
 ```
-node store.js freq-words --limit 10 --order dsc
+node store.js freq-words --limit 10 --order asc
 ```
