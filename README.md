@@ -4,7 +4,8 @@
 File store service (HTTP server and a command line client)
 
 ## Description
-A client-server application, comprising of a Spring Boot web application which includes an embedded web server as a file server and NodeJS for a client. A containerized form of the Web server can be created from this source code and deployed in Docker and Kubernetes. There are various file operations that can be carried out, and comes with a great set of file-validations such as preventing file-content and file-name duplication, concurrent file upload control and network interrupt moderation.
+A client-server application, comprising of a Spring Boot web application which includes an embedded web server as a file server and NodeJS for a client. A containerized form of the Web server can be created from this source code and deployed in Docker and Kubernetes. 
+> There are various file operations that can be carried out, and comes with a great set of file-validations such as preventing file-content and file-name duplication, concurrent file upload control and network interrupt moderation.
 
 ## Getting Started
 The project is structured under 4 folders:
@@ -21,6 +22,7 @@ The project is structured under 4 folders:
 
 ## Installation
 * For deploying this application in Docker environment, please follow the below steps:
+* The Docker image can be found here, [mukundb2000/file-store-server](https://hub.docker.com/r/mukundb2000/file-store-server)
   * Create a Docker Image On a machine with Docker installed, run the below command:
     
     `docker build -t  mukundb2000/file-store-server . `
@@ -40,7 +42,7 @@ The project is structured under 4 folders:
   
 * For testing from the client end,
   * Local environment should have NodeJS installed
-  * Please clone/download the file [@commandline-client-implementation]([Link](https://github.com/Mukundb2000/file-store/tree/develop/file-store-client/file-store-cmd))
+  * Please clone/download the file [commandline-client-implementation](https://github.com/Mukundb2000/file-store/tree/develop/file-store-client/file-store-cmd)
   * Run the below command to download all the dependencies:
   
     `npm install`
