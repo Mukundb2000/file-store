@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.mukund.filestore.config.FileStoreConfig;
 import com.mukund.filestore.model.FileModel;
 import com.mukund.filestore.model.FileStatus;
 import com.mukund.filestore.repository.FileRepository;
@@ -32,10 +33,16 @@ public class FileStoreService {
 	@Autowired
 	private WordRepository wordRepository;
 
-	private String BASE_PATH = "/files";
+	private FileStoreConfig fileStoreConfig;
 
-	private Path root = Paths.get(BASE_PATH);
+	private Path root;
 
+	public FileStoreService(FileStoreConfig fileStoreConfig) {
+
+		this.fileStoreConfig = fileStoreConfig;
+		root = Paths.get(fileStoreConfig.getBasePath());
+	}
+ 
 	public List<FileModel> getFiles(String hash, String fileName) {
 
 		List<FileModel> files;
