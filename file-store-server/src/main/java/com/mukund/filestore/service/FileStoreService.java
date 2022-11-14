@@ -32,7 +32,7 @@ public class FileStoreService {
 	@Autowired
 	private WordRepository wordRepository;
 
-	private String BASE_PATH = "D:/file-store/files";
+	private String BASE_PATH = "/files";
 
 	private Path root = Paths.get(BASE_PATH);
 
