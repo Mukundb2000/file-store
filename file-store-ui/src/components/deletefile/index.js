@@ -12,6 +12,25 @@ function DeleteFile() {
     margin: 10px 0px;
     cursor: pointer;
   `;
+  const deleteFile = async (fileName) => {
+    var res = await fetch("http://localhost:8081/files?fileName=" + fileName, {
+      method: "GET",
+    });
+    var response = await res.json();
+    if (response.length > 0) {
+      var resDel = await fetch("http://localhost:8081/files/" + fileName, {
+        method: "DELETE",
+      });
+      if(resDel.ok){
+          confirm("File Deleted Successfully");
+      }
+      else{
+          confirm("Failed to Delete File, Please try again later");
+      }
+    } else {
+      confirm("No Such Files Exist in the Store");
+    }
+  };
   return (
     <div className="main">
       <p>Enter the filename which you want to delete:</p>

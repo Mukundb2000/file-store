@@ -1,7 +1,7 @@
 // import React from 'react'
 // import styled from 'styled-components'
 // import { useTable } from 'react-table'
-
+// import fetch from "node-fetch";
 // import makeData from './makeData'
 
 // const Styles = styled.div`
@@ -45,6 +45,12 @@
 //     columns,
 //     data,
 //   })
+// const fetchAllFiles=async()=>{
+//     var res = await fetch("http://localhost:8081/files", {
+//       method: "GET"
+//     });
+//     var response = await res.json();
+// }
 
 //   // Render the UI for your table
 //   return (
