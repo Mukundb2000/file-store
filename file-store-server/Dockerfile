@@ -6,4 +6,4 @@ COPY src src
 COPY pom.xml pom.xml
 RUN mvn clean package install -DskipTests
 EXPOSE 8081
-ENTRYPOINT ["java","-jar","target/file-store-server-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java","-jar","target/file-store-server-0.0.1-SNAPSHOT.jar","--files.basePath=/tmp/file-store/files"]
